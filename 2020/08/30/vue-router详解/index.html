@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" media="all" href="/lib/Han/dist/han.min.css?v=3.3">
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="googleff7190d2f6775c25.html" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="vue-router,vue-router原理," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="是什么vue-router是Vue的官方插件库，用来管理路由  Vue的单页面应用是基于路由和组件的，路由用于设定访问路径，和组件对应起来。  路由模式vue-router 提供了三种运行模式：● hash: 使用 URL hash 值来作路由。默认模式。● history: 依赖 HTML5 History API 和服务器配置。查看 HTML5 History 模式。● abstract: 支">
+<meta property="og:type" content="article">
+<meta property="og:title" content="vue-router详解">
+<meta property="og:url" content="http://www.chenhaojun.com/2020/08/30/vue-router%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:site_name" content="CHJ">
+<meta property="og:description" content="是什么vue-router是Vue的官方插件库，用来管理路由  Vue的单页面应用是基于路由和组件的，路由用于设定访问路径，和组件对应起来。  路由模式vue-router 提供了三种运行模式：● hash: 使用 URL hash 值来作路由。默认模式。● history: 依赖 HTML5 History API 和服务器配置。查看 HTML5 History 模式。● abstract: 支">
+<meta property="article:published_time" content="2020-08-30T08:14:10.000Z">
+<meta property="article:modified_time" content="2020-12-30T08:01:09.694Z">
+<meta property="article:author" content="CHJ">
+<meta property="article:tag" content="vue-router">
+<meta property="article:tag" content="vue-router原理">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":true},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.chenhaojun.com/2020/08/30/vue-router详解/"/>
+
+
+
+
+
+  <title>vue-router详解 | CHJ</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">CHJ</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">个人博客</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-schedule">
+          <a href="/schedule/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br />
+            
+            日程表
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            站点地图
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.chenhaojun.com/2020/08/30/vue-router%E8%AF%A6%E8%A7%A3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="CHJ">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="CHJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">vue-router详解</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-30T16:14:10+08:00">
+                2020-08-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Vue/" itemprop="url" rel="index">
+                    <span itemprop="name">Vue</span>
+                  </a>
+                </span>
+
+                
+                
+                  ， 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Vue/vue-router/" itemprop="url" rel="index">
+                    <span itemprop="name">vue-router</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/08/30/vue-router%E8%AF%A6%E8%A7%A3/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2020/08/30/vue-router%E8%AF%A6%E8%A7%A3/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body han-init-context" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="是什么"><a href="#是什么" class="headerlink" title="是什么"></a>是什么</h1><p>vue-router是Vue的官方插件库，用来管理路由</p>
+<ol>
+<li>Vue的单页面应用是基于路由和组件的，路由用于设定访问路径，和组件对应起来。</li>
+</ol>
+<h2 id="路由模式"><a href="#路由模式" class="headerlink" title="路由模式"></a>路由模式</h2><p>vue-router 提供了三种运行模式：<br>● hash: 使用 URL hash 值来作路由。默认模式。<br>● history: 依赖 HTML5 History API 和服务器配置。查看 HTML5 History 模式。<br>● abstract: 支持所有 JavaScript 运行环境，如 Node.js 服务器端。</p>
+<h3 id="hash"><a href="#hash" class="headerlink" title="hash"></a>hash</h3><p>vue-router 默认模式是 hash 模式 —— 使用 URL 的 hash 来模拟一个完整的 URL，当 URL 改变时，页面不会去重新加载。<br>hash（#）是URL 的锚点，代表的是网页中的一个位置，单单改变#后的部分（/#/..），浏览器只会加载相应位置的内容，不会重新加载网页，也就是说 #是用来指导浏览器动作的，对服务器端完全无用，HTTP请求中不包括#；同时每一次改变#后的部分，都会在浏览器的访问历史中增加一个记录，使用”后退”按钮，就可以回到上一个位置；所以说Hash模式通过锚点值的改变，根据不同的值，渲染指定DOM位置的不同数据。</p>
+<h3 id="history"><a href="#history" class="headerlink" title="history"></a>history</h3><p>HTML5 History API提供了一种功能，能让开发人员在不刷新整个页面的情况下修改站点的URL，就是利用 history.pushState API 来完成 URL 跳转而无须重新加载页面；<br>由于hash模式会在url中自带#，如果不想要很丑的 hash，我们可以用路由的 history 模式，只需要在配置路由规则时，加入”mode: ‘history’”,这种模式充分利用 history.pushState API 来完成 URL 跳转而无须重新加载页面。<br>但是这种方式需要后端配置对应的URL，不然访问会出现404</p>
+<h3 id="abstract"><a href="#abstract" class="headerlink" title="abstract"></a>abstract</h3><p>为了兼容其他环境，如node环境的模式。会判断是否有window对应的api</p>
+<h1 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h1><p>在Vue里使用vue-router只要引入vue-router组件。然后使用<code>Vue.use()</code>方法就会调用vue-router里的install方法</p>
+<h2 id="install方法"><a href="#install方法" class="headerlink" title="install方法"></a>install方法</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> View <span class="keyword">from</span> <span class="string">'./components/view'</span></span><br><span class="line"><span class="keyword">import</span> Link <span class="keyword">from</span> <span class="string">'./components/link'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">let</span> _Vue</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">install</span> (<span class="params">Vue</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (install.installed &amp;&amp; _Vue === Vue) <span class="keyword">return</span></span><br><span class="line">  install.installed = <span class="literal">true</span></span><br><span class="line"></span><br><span class="line">  _Vue = Vue</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> isDef = <span class="function"><span class="params">v</span> =&gt;</span> v !== <span class="literal">undefined</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> registerInstance = <span class="function">(<span class="params">vm, callVal</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> i = vm.$options._parentVnode</span><br><span class="line">    <span class="keyword">if</span> (isDef(i) &amp;&amp; isDef(i = i.data) &amp;&amp; isDef(i = i.registerRouteInstance)) &#123;</span><br><span class="line">      i(vm, callVal)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  Vue.mixin(&#123;</span><br><span class="line">    beforeCreate () &#123;</span><br><span class="line">      <span class="keyword">if</span> (isDef(<span class="keyword">this</span>.$options.router)) &#123;</span><br><span class="line">        <span class="keyword">this</span>._routerRoot = <span class="keyword">this</span></span><br><span class="line">        <span class="keyword">this</span>._router = <span class="keyword">this</span>.$options.router</span><br><span class="line">        <span class="keyword">this</span>._router.init(<span class="keyword">this</span>)</span><br><span class="line">        Vue.util.defineReactive(<span class="keyword">this</span>, <span class="string">'_route'</span>, <span class="keyword">this</span>._router.history.current)</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">this</span>._routerRoot = (<span class="keyword">this</span>.$parent &amp;&amp; <span class="keyword">this</span>.$parent._routerRoot) || <span class="keyword">this</span></span><br><span class="line">      &#125;</span><br><span class="line">      registerInstance(<span class="keyword">this</span>, <span class="keyword">this</span>)</span><br><span class="line">    &#125;,</span><br><span class="line">    destroyed () &#123;</span><br><span class="line">      registerInstance(<span class="keyword">this</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  <span class="built_in">Object</span>.defineProperty(Vue.prototype, <span class="string">'$router'</span>, &#123;</span><br><span class="line">    <span class="keyword">get</span> () &#123; <span class="keyword">return</span> <span class="keyword">this</span>._routerRoot._router &#125;</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  <span class="built_in">Object</span>.defineProperty(Vue.prototype, <span class="string">'$route'</span>, &#123;</span><br><span class="line">    <span class="keyword">get</span> () &#123; <span class="keyword">return</span> <span class="keyword">this</span>._routerRoot._route &#125;</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  Vue.component(<span class="string">'RouterView'</span>, View)</span><br><span class="line">  Vue.component(<span class="string">'RouterLink'</span>, Link)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> strats = Vue.config.optionMergeStrategies</span><br><span class="line">  <span class="comment">// use the same hook merging strategy for route hooks</span></span><br><span class="line">  strats.beforeRouteEnter = strats.beforeRouteLeave = strats.beforeRouteUpdate = strats.created</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>这里使用了一个全局混入<code>Vue.mixin()</code>把<code>beforeCreate</code>和<code>destory</code>钩子函数注册到每一个函数中，然后会调用<code>init()</code>方法</li>
+<li>然后注册<code>$router</code>和<code>$route</code>变量</li>
+<li>然后注册<code>RouterView</code>和<code>RouterLink</code>组件</li>
+</ol>
+<h2 id="VueRouter"><a href="#VueRouter" class="headerlink" title="VueRouter"></a>VueRouter</h2><p>接下我们本应该来看<code>init</code>方法，但<code>init</code>方法定义在 <code>VueRouter</code> 类里面，所以在调用init之前必先实例化<code>VueRouter</code>。先来看看 VueRouter</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="class"><span class="keyword">class</span> <span class="title">VueRouter</span> </span>&#123;</span><br><span class="line">  <span class="keyword">static</span> install: <span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">void</span></span><br><span class="line">  <span class="keyword">static</span> version: string</span><br><span class="line">  <span class="keyword">static</span> isNavigationFailure: <span class="built_in">Function</span></span><br><span class="line">  <span class="keyword">static</span> NavigationFailureType: any</span><br><span class="line"></span><br><span class="line">  app: any</span><br><span class="line">  apps: <span class="built_in">Array</span>&lt;any&gt;</span><br><span class="line">  ready: boolean</span><br><span class="line">  readyCbs: <span class="built_in">Array</span>&lt;<span class="built_in">Function</span>&gt;</span><br><span class="line">  options: RouterOptions</span><br><span class="line">  mode: string</span><br><span class="line">  history: HashHistory | HTML5History | AbstractHistory</span><br><span class="line">  matcher: Matcher</span><br><span class="line">  fallback: boolean</span><br><span class="line">  beforeHooks: <span class="built_in">Array</span>&lt;?NavigationGuard&gt;</span><br><span class="line">  resolveHooks: <span class="built_in">Array</span>&lt;?NavigationGuard&gt;</span><br><span class="line">  afterHooks: <span class="built_in">Array</span>&lt;?AfterNavigationHook&gt;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">constructor</span> (options: RouterOptions = &#123;&#125;) &#123;</span><br><span class="line">    <span class="keyword">this</span>.app = <span class="literal">null</span></span><br><span class="line">    <span class="keyword">this</span>.apps = []</span><br><span class="line">    <span class="keyword">this</span>.options = options</span><br><span class="line">    <span class="keyword">this</span>.beforeHooks = []</span><br><span class="line">    <span class="keyword">this</span>.resolveHooks = []</span><br><span class="line">    <span class="keyword">this</span>.afterHooks = []</span><br><span class="line">    <span class="comment">// 创建 matcher 匹配函数</span></span><br><span class="line">    <span class="keyword">this</span>.matcher = createMatcher(options.routes || [], <span class="keyword">this</span>)</span><br><span class="line">    <span class="comment">// 根据 mode 实例化具体的 History，默认为'hash'模式</span></span><br><span class="line">    <span class="keyword">var</span> mode = options.mode || <span class="string">'hash'</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 通过 supportsPushState 判断浏览器是否支持'history'模式</span></span><br><span class="line">    <span class="comment">// 如果设置的是'history'但是如果浏览器不支持的话，'history'模式会退回到'hash'模式</span></span><br><span class="line">    <span class="comment">// fallback 是当浏览器不支持 history.pushState 控制路由是否应该回退到 hash 模式。默认值为 true。</span></span><br><span class="line">    <span class="keyword">this</span>.fallback =</span><br><span class="line">      mode === <span class="string">'history'</span> &amp;&amp; !supportsPushState &amp;&amp; options.fallback !== <span class="literal">false</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.fallback) &#123;</span><br><span class="line">      mode = <span class="string">'hash'</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (!inBrowser) &#123;</span><br><span class="line">      mode = <span class="string">'abstract'</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">this</span>.mode = mode</span><br><span class="line">    <span class="comment">// 根据不同模式选择实例化对应的 History 类</span></span><br><span class="line">    <span class="keyword">switch</span> (mode) &#123;</span><br><span class="line">      <span class="keyword">case</span> <span class="string">'history'</span>:</span><br><span class="line">        <span class="keyword">this</span>.history = <span class="keyword">new</span> HTML5History(<span class="keyword">this</span>, options.base)</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">      <span class="keyword">case</span> <span class="string">'hash'</span>:</span><br><span class="line">        <span class="keyword">this</span>.history = <span class="keyword">new</span> HashHistory(<span class="keyword">this</span>, options.base, <span class="keyword">this</span>.fallback)</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">      <span class="keyword">case</span> <span class="string">'abstract'</span>:</span><br><span class="line">        <span class="keyword">this</span>.history = <span class="keyword">new</span> AbstractHistory(<span class="keyword">this</span>, options.base)</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">      <span class="keyword">default</span>:</span><br><span class="line">        <span class="keyword">if</span> (process.env.NODE_ENV !== <span class="string">'production'</span>) &#123;</span><br><span class="line">          assert(<span class="literal">false</span>, <span class="string">`invalid mode: <span class="subst">$&#123;mode&#125;</span>`</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  init (app: any <span class="comment">/* Vue component instance */</span>) &#123;</span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里可以看见在初始化的时候<code>this.matcher = createMatcher(options.routes || [], this)</code>执行了createMatcher方法</p>
+<h3 id="createMatcher方法相关"><a href="#createMatcher方法相关" class="headerlink" title="createMatcher方法相关"></a>createMatcher方法相关</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> type Matcher = &#123;</span><br><span class="line">  match: <span class="function">(<span class="params">raw: RawLocation, current?: Route, redirectedFrom?: Location</span>) =&gt;</span> Route;</span><br><span class="line">  addRoutes: <span class="function">(<span class="params">routes: <span class="built_in">Array</span>&lt;RouteConfig&gt;</span>) =&gt;</span> <span class="keyword">void</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">createMatcher</span> (<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">  routes: Array&lt;RouteConfig&gt;,</span></span></span><br><span class="line"><span class="function"><span class="params">  router: VueRouter</span></span></span><br><span class="line"><span class="function"><span class="params"></span>): <span class="title">Matcher</span> </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; pathList, pathMap, nameMap &#125; = createRouteMap(routes)</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">addRoutes</span> (<span class="params">routes</span>) </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">match</span> (<span class="params"></span>): <span class="title">Route</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">redirect</span> (<span class="params"></span>): <span class="title">Route</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">alias</span> (<span class="params"></span>): <span class="title">Route</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">_createRoute</span> (<span class="params"></span>): <span class="title">Route</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    match,</span><br><span class="line">    addRoutes</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>createMatcher(options.routes || [], this)</code> 接收两个参数 一个为路由参数如下，另一个是<code>new VueRouter()</code>的实例。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> routes = [</span><br><span class="line">  &#123; <span class="attr">path</span>: <span class="string">'/foo'</span>, <span class="attr">component</span>: Foo &#125;,</span><br><span class="line">  &#123; <span class="attr">path</span>: <span class="string">'/bar'</span>, <span class="attr">component</span>: Bar &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<ol>
+<li><code>createMatcher</code>首先执行的逻辑是 <code>const { pathList, pathMap, nameMap } = createRouteMap(routes)</code> 创建一个路由映射表，<code>createRouteMap</code> 的定义在 <code>src/create-route-map</code> 中：<br><code>createRouteMap</code> 函数的目标是把用户的路由配置转换成一张路由映射表，它包含 3 个部分，pathList 存储所有的 path，pathMap 表示一个 path 到 RouteRecord 的映射关系，而 nameMap 表示 name 到 RouteRecord 的映射关系。</li>
+<li>暴露出<code>match</code> 和 <code>addRoutes</code> 方法</li>
+</ol>
+<h4 id="addRoutes-方法"><a href="#addRoutes-方法" class="headerlink" title="addRoutes 方法"></a>addRoutes 方法</h4><p>其的作用是动态添加路由配置，因为在实际开发中有些场景是不能提前把路由写死的，需要根据一些条件动态添加路由，所以 Vue-Router 也提供了这一接口：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">addRoutes</span> (<span class="params">routes</span>) </span>&#123;</span><br><span class="line">  createRouteMap(routes, pathList, pathMap, nameMap)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>addRoutes 的方法十分简单，再次调用 createRouteMap 即可，传入新的 routes 配置，由于 pathList、pathMap、nameMap 都是引用类型，执行 addRoutes 后会修改它们的值。</p>
+<h4 id="match-方法"><a href="#match-方法" class="headerlink" title="match 方法"></a>match 方法</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">match</span> (<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">  raw: RawLocation,</span></span></span><br><span class="line"><span class="function"><span class="params">  currentRoute?: Route,</span></span></span><br><span class="line"><span class="function"><span class="params">  redirectedFrom?: Location</span></span></span><br><span class="line"><span class="function"><span class="params"></span>): <span class="title">Route</span> </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> location = normalizeLocation(raw, currentRoute, <span class="literal">false</span>, router)</span><br><span class="line">  <span class="keyword">const</span> &#123; name &#125; = location</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (name) &#123;</span><br><span class="line">    <span class="keyword">const</span> record = nameMap[name]</span><br><span class="line">    <span class="keyword">if</span> (process.env.NODE_ENV !== <span class="string">'production'</span>) &#123;</span><br><span class="line">      warn(record, <span class="string">`Route with name '<span class="subst">$&#123;name&#125;</span>' does not exist`</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (!record) <span class="keyword">return</span> _createRoute(<span class="literal">null</span>, location)</span><br><span class="line">    <span class="keyword">const</span> paramNames = record.regex.keys</span><br><span class="line">      .filter(<span class="function"><span class="params">key</span> =&gt;</span> !key.optional)</span><br><span class="line">      .map(<span class="function"><span class="params">key</span> =&gt;</span> key.name)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> location.params !== <span class="string">'object'</span>) &#123;</span><br><span class="line">      location.params = &#123;&#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (currentRoute &amp;&amp; <span class="keyword">typeof</span> currentRoute.params === <span class="string">'object'</span>) &#123;</span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">const</span> key <span class="keyword">in</span> currentRoute.params) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!(key <span class="keyword">in</span> location.params) &amp;&amp; paramNames.indexOf(key) &gt; <span class="number">-1</span>) &#123;</span><br><span class="line">          location.params[key] = currentRoute.params[key]</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    location.path = fillParams(record.path, location.params, <span class="string">`named route "<span class="subst">$&#123;name&#125;</span>"`</span>)</span><br><span class="line">    <span class="keyword">return</span> _createRoute(record, location, redirectedFrom)</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (location.path) &#123;</span><br><span class="line">    location.params = &#123;&#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; pathList.length; i++) &#123;</span><br><span class="line">      <span class="keyword">const</span> path = pathList[i]</span><br><span class="line">      <span class="keyword">const</span> record = pathMap[path]</span><br><span class="line">      <span class="keyword">if</span> (matchRoute(record.regex, location.path, location.params)) &#123;</span><br><span class="line">        <span class="keyword">return</span> _createRoute(record, location, redirectedFrom)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// no match</span></span><br><span class="line">  <span class="keyword">return</span> _createRoute(<span class="literal">null</span>, location)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">_createRoute</span> (<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">  record: ?RouteRecord,</span></span></span><br><span class="line"><span class="function"><span class="params">  location: Location,</span></span></span><br><span class="line"><span class="function"><span class="params">  redirectedFrom?: Location</span></span></span><br><span class="line"><span class="function"><span class="params"></span>): <span class="title">Route</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (record &amp;&amp; record.redirect) &#123;</span><br><span class="line">    <span class="keyword">return</span> redirect(record, redirectedFrom || location)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (record &amp;&amp; record.matchAs) &#123;</span><br><span class="line">    <span class="keyword">return</span> alias(record, location, record.matchAs)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> createRoute(record, location, redirectedFrom, router)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">redirect</span> (<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">    record: RouteRecord,</span></span></span><br><span class="line"><span class="function"><span class="params">    location: Location</span></span></span><br><span class="line"><span class="function"><span class="params">  </span>): <span class="title">Route</span> </span>&#123;</span><br><span class="line">    <span class="keyword">const</span> originalRedirect = record.redirect</span><br><span class="line">    <span class="keyword">let</span> redirect = <span class="keyword">typeof</span> originalRedirect === <span class="string">'function'</span></span><br><span class="line">      ? originalRedirect(createRoute(record, location, <span class="literal">null</span>, router))</span><br><span class="line">      : originalRedirect</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> redirect === <span class="string">'string'</span>) &#123;</span><br><span class="line">      redirect = &#123; <span class="attr">path</span>: redirect &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!redirect || <span class="keyword">typeof</span> redirect !== <span class="string">'object'</span>) &#123;</span><br><span class="line">      <span class="keyword">if</span> (process.env.NODE_ENV !== <span class="string">'production'</span>) &#123;</span><br><span class="line">        warn(</span><br><span class="line">          <span class="literal">false</span>, <span class="string">`invalid redirect option: <span class="subst">$&#123;<span class="built_in">JSON</span>.stringify(redirect)&#125;</span>`</span></span><br><span class="line">        )</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> _createRoute(<span class="literal">null</span>, location)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> re: <span class="built_in">Object</span> = redirect</span><br><span class="line">    <span class="keyword">const</span> &#123; name, path &#125; = re</span><br><span class="line">    <span class="keyword">let</span> &#123; query, hash, params &#125; = location</span><br><span class="line">    query = re.hasOwnProperty(<span class="string">'query'</span>) ? re.query : query</span><br><span class="line">    hash = re.hasOwnProperty(<span class="string">'hash'</span>) ? re.hash : hash</span><br><span class="line">    params = re.hasOwnProperty(<span class="string">'params'</span>) ? re.params : params</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (name) &#123;</span><br><span class="line">      <span class="comment">// resolved named direct</span></span><br><span class="line">      <span class="keyword">const</span> targetRecord = nameMap[name]</span><br><span class="line">      <span class="keyword">if</span> (process.env.NODE_ENV !== <span class="string">'production'</span>) &#123;</span><br><span class="line">        assert(targetRecord, <span class="string">`redirect failed: named route "<span class="subst">$&#123;name&#125;</span>" not found.`</span>)</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> match(&#123;</span><br><span class="line">        _normalized: <span class="literal">true</span>,</span><br><span class="line">        name,</span><br><span class="line">        query,</span><br><span class="line">        hash,</span><br><span class="line">        params</span><br><span class="line">      &#125;, <span class="literal">undefined</span>, location)</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (path) &#123;</span><br><span class="line">      <span class="comment">// 1. resolve relative redirect</span></span><br><span class="line">      <span class="keyword">const</span> rawPath = resolveRecordPath(path, record)</span><br><span class="line">      <span class="comment">// 2. resolve params</span></span><br><span class="line">      <span class="keyword">const</span> resolvedPath = fillParams(rawPath, params, <span class="string">`redirect route with path "<span class="subst">$&#123;rawPath&#125;</span>"`</span>)</span><br><span class="line">      <span class="comment">// 3. rematch with existing query and hash</span></span><br><span class="line">      <span class="keyword">return</span> match(&#123;</span><br><span class="line">        _normalized: <span class="literal">true</span>,</span><br><span class="line">        path: resolvedPath,</span><br><span class="line">        query,</span><br><span class="line">        hash</span><br><span class="line">      &#125;, <span class="literal">undefined</span>, location)</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (process.env.NODE_ENV !== <span class="string">'production'</span>) &#123;</span><br><span class="line">        warn(<span class="literal">false</span>, <span class="string">`invalid redirect option: <span class="subst">$&#123;<span class="built_in">JSON</span>.stringify(redirect)&#125;</span>`</span>)</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> _createRoute(<span class="literal">null</span>, location)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">alias</span> (<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">  record: RouteRecord,</span></span></span><br><span class="line"><span class="function"><span class="params">  location: Location,</span></span></span><br><span class="line"><span class="function"><span class="params">  matchAs: string</span></span></span><br><span class="line"><span class="function"><span class="params"></span>): <span class="title">Route</span> </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> aliasedPath = fillParams(matchAs, location.params, <span class="string">`aliased route with path "<span class="subst">$&#123;matchAs&#125;</span>"`</span>)</span><br><span class="line">  <span class="keyword">const</span> aliasedMatch = match(&#123;</span><br><span class="line">    _normalized: <span class="literal">true</span>,</span><br><span class="line">    path: aliasedPath</span><br><span class="line">  &#125;)</span><br><span class="line">  <span class="keyword">if</span> (aliasedMatch) &#123;</span><br><span class="line">    <span class="keyword">const</span> matched = aliasedMatch.matched</span><br><span class="line">    <span class="keyword">const</span> aliasedRecord = matched[matched.length - <span class="number">1</span>]</span><br><span class="line">    location.params = aliasedMatch.params</span><br><span class="line">    <span class="keyword">return</span> _createRoute(aliasedRecord, location)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> _createRoute(<span class="literal">null</span>, location)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>match 方法接收 3 个参数，其中 raw 是 RawLocation 类型，它可以是一个 url 字符串，也可以是一个 Location 对象；currentRoute 是 Route 类型，它表示当前的路径；redirectedFrom 和重定向相关，这里先忽略。<br>match 方法返回的是一个路径，它的作用是根据传入的 raw 和当前的路径 currentRoute 计算出一个新的路径并返回。</p>
+<h3 id="init方法"><a href="#init方法" class="headerlink" title="init方法"></a>init方法</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">init (app: any <span class="comment">/* Vue component instance */</span>) &#123;</span><br><span class="line">    process.env.NODE_ENV !== <span class="string">'production'</span> &amp;&amp;</span><br><span class="line">      assert(</span><br><span class="line">        install.installed,</span><br><span class="line">        <span class="string">`not installed. Make sure to call \`Vue.use(VueRouter)\` `</span> +</span><br><span class="line">          <span class="string">`before creating root instance.`</span></span><br><span class="line">      )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.apps.push(app)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// set up app destroyed handler</span></span><br><span class="line">    <span class="comment">// https://github.com/vuejs/vue-router/issues/2639</span></span><br><span class="line">    app.$once(<span class="string">'hook:destroyed'</span>, () =&gt; &#123;</span><br><span class="line">      <span class="comment">// clean out app from this.apps array once destroyed</span></span><br><span class="line">      <span class="keyword">const</span> index = <span class="keyword">this</span>.apps.indexOf(app)</span><br><span class="line">      <span class="keyword">if</span> (index &gt; <span class="number">-1</span>) <span class="keyword">this</span>.apps.splice(index, <span class="number">1</span>)</span><br><span class="line">      <span class="comment">// ensure we still have a main app or null if no apps</span></span><br><span class="line">      <span class="comment">// we do not release the router so it can be reused</span></span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">this</span>.app === app) <span class="keyword">this</span>.app = <span class="keyword">this</span>.apps[<span class="number">0</span>] || <span class="literal">null</span></span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (!<span class="keyword">this</span>.app) <span class="keyword">this</span>.history.teardown()</span><br><span class="line">    &#125;)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// main app previously initialized</span></span><br><span class="line">    <span class="comment">// return as we don't need to set up new history listener</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.app) &#123;</span><br><span class="line">      <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.app = app</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> history = <span class="keyword">this</span>.history</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (history <span class="keyword">instanceof</span> HTML5History || history <span class="keyword">instanceof</span> HashHistory) &#123;</span><br><span class="line">      <span class="keyword">const</span> handleInitialScroll = <span class="function"><span class="params">routeOrError</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">const</span> <span class="keyword">from</span> = history.current</span><br><span class="line">        <span class="keyword">const</span> expectScroll = <span class="keyword">this</span>.options.scrollBehavior</span><br><span class="line">        <span class="keyword">const</span> supportsScroll = supportsPushState &amp;&amp; expectScroll</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (supportsScroll &amp;&amp; <span class="string">'fullPath'</span> <span class="keyword">in</span> routeOrError) &#123;</span><br><span class="line">          handleScroll(<span class="keyword">this</span>, routeOrError, <span class="keyword">from</span>, <span class="literal">false</span>)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">const</span> setupListeners = <span class="function"><span class="params">routeOrError</span> =&gt;</span> &#123;</span><br><span class="line">        history.setupListeners()</span><br><span class="line">        handleInitialScroll(routeOrError)</span><br><span class="line">      &#125;</span><br><span class="line">      history.transitionTo(</span><br><span class="line">        history.getCurrentLocation(),</span><br><span class="line">        setupListeners,</span><br><span class="line">        setupListeners</span><br><span class="line">      )</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    history.listen(<span class="function"><span class="params">route</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">this</span>.apps.forEach(<span class="function"><span class="params">app</span> =&gt;</span> &#123;</span><br><span class="line">        app._route = route</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br></pre></td><td class="code"><pre><span class="line">match (raw: RawLocation, current?: Route, redirectedFrom?: Location): Route &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">this</span>.matcher.match(raw, current, redirectedFrom)</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">get</span> currentRoute (): ?Route &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">this</span>.history &amp;&amp; <span class="keyword">this</span>.history.current</span><br><span class="line">&#125;</span><br><span class="line">beforeEach (fn: <span class="built_in">Function</span>): <span class="built_in">Function</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> registerHook(<span class="keyword">this</span>.beforeHooks, fn)</span><br><span class="line">&#125;</span><br><span class="line">beforeResolve (fn: <span class="built_in">Function</span>): <span class="built_in">Function</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> registerHook(<span class="keyword">this</span>.resolveHooks, fn)</span><br><span class="line">&#125;</span><br><span class="line">afterEach (fn: <span class="built_in">Function</span>): <span class="built_in">Function</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> registerHook(<span class="keyword">this</span>.afterHooks, fn)</span><br><span class="line">&#125;</span><br><span class="line">onReady (cb: <span class="built_in">Function</span>, errorCb?: <span class="built_in">Function</span>) &#123;</span><br><span class="line">  <span class="keyword">this</span>.history.onReady(cb, errorCb)</span><br><span class="line">&#125;</span><br><span class="line">onError (errorCb: <span class="built_in">Function</span>) &#123;</span><br><span class="line">  <span class="keyword">this</span>.history.onError(errorCb)</span><br><span class="line">&#125;</span><br><span class="line">push (location: RawLocation, onComplete?: <span class="built_in">Function</span>, onAbort?: <span class="built_in">Function</span>) &#123;</span><br><span class="line">  <span class="comment">// $flow-disable-line</span></span><br><span class="line">  <span class="keyword">if</span> (!onComplete &amp;&amp; !onAbort &amp;&amp; <span class="keyword">typeof</span> <span class="built_in">Promise</span> !== <span class="string">'undefined'</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">this</span>.history.push(location, resolve, reject)</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">this</span>.history.push(location, onComplete, onAbort)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">replace (location: RawLocation, onComplete?: <span class="built_in">Function</span>, onAbort?: <span class="built_in">Function</span>) &#123;</span><br><span class="line">  <span class="comment">// $flow-disable-line</span></span><br><span class="line">  <span class="keyword">if</span> (!onComplete &amp;&amp; !onAbort &amp;&amp; <span class="keyword">typeof</span> <span class="built_in">Promise</span> !== <span class="string">'undefined'</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">this</span>.history.replace(location, resolve, reject)</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">this</span>.history.replace(location, onComplete, onAbort)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">go (n: number) &#123;</span><br><span class="line">  <span class="keyword">this</span>.history.go(n)</span><br><span class="line">&#125;</span><br><span class="line">back () &#123;</span><br><span class="line">  <span class="keyword">this</span>.go(<span class="number">-1</span>)</span><br><span class="line">&#125;</span><br><span class="line">forward () &#123;</span><br><span class="line">  <span class="keyword">this</span>.go(<span class="number">1</span>)</span><br><span class="line">&#125;</span><br><span class="line">getMatchedComponents (to?: RawLocation | Route): <span class="built_in">Array</span>&lt;any&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> route: any = to</span><br><span class="line">    ? to.matched</span><br><span class="line">      ? to</span><br><span class="line">      : <span class="keyword">this</span>.resolve(to).route</span><br><span class="line">    : <span class="keyword">this</span>.currentRoute</span><br><span class="line">  <span class="keyword">if</span> (!route) &#123;</span><br><span class="line">    <span class="keyword">return</span> []</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> [].concat.apply(</span><br><span class="line">    [],</span><br><span class="line">    route.matched.map(<span class="function"><span class="params">m</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">Object</span>.keys(m.components).map(<span class="function"><span class="params">key</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> m.components[key]</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;)</span><br><span class="line">  )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">resolve (</span><br><span class="line">  to: RawLocation,</span><br><span class="line">  current?: Route,</span><br><span class="line">  append?: boolean</span><br><span class="line">): &#123;</span><br><span class="line">  location: Location,</span><br><span class="line">  route: Route,</span><br><span class="line">  href: string,</span><br><span class="line">  <span class="comment">// for backwards compat</span></span><br><span class="line">  normalizedTo: Location,</span><br><span class="line">  resolved: Route</span><br><span class="line">&#125; &#123;</span><br><span class="line">  current = current || <span class="keyword">this</span>.history.current</span><br><span class="line">  <span class="keyword">const</span> location = normalizeLocation(to, current, append, <span class="keyword">this</span>)</span><br><span class="line">  <span class="keyword">const</span> route = <span class="keyword">this</span>.match(location, current)</span><br><span class="line">  <span class="keyword">const</span> fullPath = route.redirectedFrom || route.fullPath</span><br><span class="line">  <span class="keyword">const</span> base = <span class="keyword">this</span>.history.base</span><br><span class="line">  <span class="keyword">const</span> href = createHref(base, fullPath, <span class="keyword">this</span>.mode)</span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    location,</span><br><span class="line">    route,</span><br><span class="line">    href,</span><br><span class="line">    <span class="comment">// for backwards compat</span></span><br><span class="line">    normalizedTo: location,</span><br><span class="line">    resolved: route</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">addRoutes (routes: <span class="built_in">Array</span>&lt;RouteConfig&gt;) &#123;</span><br><span class="line">  <span class="keyword">this</span>.matcher.addRoutes(routes)</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">this</span>.history.current !== START) &#123;</span><br><span class="line">    <span class="keyword">this</span>.history.transitionTo(<span class="keyword">this</span>.history.getCurrentLocation())</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>主要来看<code>init</code>方法: 根据history类型执行对应的方法。先定义了 <code>setupHashListener</code> 函数，接着执行了 <code>history.transitionTo</code> 方法</p>
+<h2 id="transitionTo"><a href="#transitionTo" class="headerlink" title="transitionTo()"></a>transitionTo()</h2><p><code>transitionTo</code> 定义在 <code>src/history/base.js</code>中 <code>hashHistory</code>和<code>HTML5History</code>继承<code>base.js</code>的<code>transitionTo</code>方法</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="class"><span class="keyword">class</span> <span class="title">History</span> </span>&#123;</span><br><span class="line">  router: Router</span><br><span class="line">  base: string</span><br><span class="line">  current: Route</span><br><span class="line">  pending: ?Route</span><br><span class="line">  cb: <span class="function">(<span class="params">r: Route</span>) =&gt;</span> <span class="keyword">void</span></span><br><span class="line">  ready: boolean</span><br><span class="line">  readyCbs: <span class="built_in">Array</span>&lt;<span class="built_in">Function</span>&gt;</span><br><span class="line">  readyErrorCbs: <span class="built_in">Array</span>&lt;<span class="built_in">Function</span>&gt;</span><br><span class="line">  errorCbs: <span class="built_in">Array</span>&lt;<span class="built_in">Function</span>&gt;</span><br><span class="line">  listeners: <span class="built_in">Array</span>&lt;<span class="built_in">Function</span>&gt;</span><br><span class="line">  cleanupListeners: <span class="built_in">Function</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// implemented by sub-classes</span></span><br><span class="line">  +go: <span class="function">(<span class="params">n: number</span>) =&gt;</span> <span class="keyword">void</span></span><br><span class="line">  +push: <span class="function">(<span class="params">loc: RawLocation, onComplete?: <span class="built_in">Function</span>, onAbort?: <span class="built_in">Function</span></span>) =&gt;</span> <span class="keyword">void</span></span><br><span class="line">  +replace: (</span><br><span class="line">    loc: RawLocation,</span><br><span class="line">    onComplete?: <span class="built_in">Function</span>,</span><br><span class="line">    onAbort?: <span class="built_in">Function</span></span><br><span class="line">  ) =&gt; <span class="keyword">void</span></span><br><span class="line">  +ensureURL: <span class="function">(<span class="params">push?: boolean</span>) =&gt;</span> <span class="keyword">void</span></span><br><span class="line">  +getCurrentLocation: <span class="function"><span class="params">()</span> =&gt;</span> string</span><br><span class="line">  +setupListeners: <span class="built_in">Function</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">constructor</span> (router: Router, base: ?string) &#123;</span><br><span class="line">    <span class="keyword">this</span>.router = router</span><br><span class="line">    <span class="keyword">this</span>.base = normalizeBase(base)</span><br><span class="line">    <span class="comment">// start with a route object that stands for "nowhere"</span></span><br><span class="line">    <span class="keyword">this</span>.current = START</span><br><span class="line">    <span class="keyword">this</span>.pending = <span class="literal">null</span></span><br><span class="line">    <span class="keyword">this</span>.ready = <span class="literal">false</span></span><br><span class="line">    <span class="keyword">this</span>.readyCbs = []</span><br><span class="line">    <span class="keyword">this</span>.readyErrorCbs = []</span><br><span class="line">    <span class="keyword">this</span>.errorCbs = []</span><br><span class="line">    <span class="keyword">this</span>.listeners = []</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  listen (cb: <span class="built_in">Function</span>) &#123;</span><br><span class="line">    <span class="keyword">this</span>.cb = cb</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  onReady (cb: <span class="built_in">Function</span>, <span class="attr">errorCb</span>: ?<span class="built_in">Function</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.ready) &#123;</span><br><span class="line">      cb()</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="keyword">this</span>.readyCbs.push(cb)</span><br><span class="line">      <span class="keyword">if</span> (errorCb) &#123;</span><br><span class="line">        <span class="keyword">this</span>.readyErrorCbs.push(errorCb)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  onError (errorCb: <span class="built_in">Function</span>) &#123;</span><br><span class="line">    <span class="keyword">this</span>.errorCbs.push(errorCb)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  transitionTo (</span><br><span class="line">    location: RawLocation,</span><br><span class="line">    onComplete?: <span class="built_in">Function</span>,</span><br><span class="line">    onAbort?: <span class="built_in">Function</span></span><br><span class="line">  ) &#123;</span><br><span class="line">    <span class="keyword">let</span> route</span><br><span class="line">    <span class="comment">// catch redirect option https://github.com/vuejs/vue-router/issues/3201</span></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      route = <span class="keyword">this</span>.router.match(location, <span class="keyword">this</span>.current)</span><br><span class="line">    &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">      <span class="keyword">this</span>.errorCbs.forEach(<span class="function"><span class="params">cb</span> =&gt;</span> &#123;</span><br><span class="line">        cb(e)</span><br><span class="line">      &#125;)</span><br><span class="line">      <span class="comment">// Exception should still be thrown</span></span><br><span class="line">      <span class="keyword">throw</span> e</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">const</span> prev = <span class="keyword">this</span>.current</span><br><span class="line">    <span class="keyword">this</span>.confirmTransition(</span><br><span class="line">      route,</span><br><span class="line">      () =&gt; &#123;</span><br><span class="line">        <span class="keyword">this</span>.updateRoute(route)</span><br><span class="line">        onComplete &amp;&amp; onComplete(route)</span><br><span class="line">        <span class="keyword">this</span>.ensureURL()</span><br><span class="line">        <span class="keyword">this</span>.router.afterHooks.forEach(<span class="function"><span class="params">hook</span> =&gt;</span> &#123;</span><br><span class="line">          hook &amp;&amp; hook(route, prev)</span><br><span class="line">        &#125;)</span><br><span class="line"></span><br><span class="line">        <span class="comment">// fire ready cbs once</span></span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">this</span>.ready) &#123;</span><br><span class="line">          <span class="keyword">this</span>.ready = <span class="literal">true</span></span><br><span class="line">          <span class="keyword">this</span>.readyCbs.forEach(<span class="function"><span class="params">cb</span> =&gt;</span> &#123;</span><br><span class="line">            cb(route)</span><br><span class="line">          &#125;)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;,</span><br><span class="line">      err =&gt; &#123;</span><br><span class="line">        <span class="keyword">if</span> (onAbort) &#123;</span><br><span class="line">          onAbort(err)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (err &amp;&amp; !<span class="keyword">this</span>.ready) &#123;</span><br><span class="line">          <span class="comment">// Initial redirection should not mark the history as ready yet</span></span><br><span class="line">          <span class="comment">// because it's triggered by the redirection instead</span></span><br><span class="line">          <span class="comment">// https://github.com/vuejs/vue-router/issues/3225</span></span><br><span class="line">          <span class="comment">// https://github.com/vuejs/vue-router/issues/3331</span></span><br><span class="line">          <span class="keyword">if</span> (!isNavigationFailure(err, NavigationFailureType.redirected) || prev !== START) &#123;</span><br><span class="line">            <span class="keyword">this</span>.ready = <span class="literal">true</span></span><br><span class="line">            <span class="keyword">this</span>.readyErrorCbs.forEach(<span class="function"><span class="params">cb</span> =&gt;</span> &#123;</span><br><span class="line">              cb(err)</span><br><span class="line">            &#125;)</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br><span class="line">  updateRoute (route: Route) &#123;</span><br><span class="line">    <span class="keyword">this</span>.current = route</span><br><span class="line">    <span class="keyword">this</span>.cb &amp;&amp; <span class="keyword">this</span>.cb(route)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>transtionTo方法：</p>
+<ol>
+<li>首先会调用<code>route = this.router.match(location, this.current)</code>，也就是上面createMatcher类中的match方法匹配到目标路径</li>
+<li>接下来会调用<code>confirmTransition</code>做真正的切换，然后会执行函数内的回调函数</li>
+</ol>
+<h3 id="confirmTransition"><a href="#confirmTransition" class="headerlink" title="confirmTransition"></a>confirmTransition</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br></pre></td><td class="code"><pre><span class="line">confirmTransition (route: Route, <span class="attr">onComplete</span>: <span class="built_in">Function</span>, onAbort?: <span class="built_in">Function</span>) &#123;</span><br><span class="line">  <span class="comment">//  首先定义了 abort 函数，然后判断如果满足计算后的 route 和 current 是相同路径的话，则直接调用 this.ensureUrl 和 abort。</span></span><br><span class="line">  <span class="keyword">const</span> current = <span class="keyword">this</span>.current</span><br><span class="line">  <span class="keyword">this</span>.pending = route</span><br><span class="line">  <span class="keyword">const</span> abort = <span class="function"><span class="params">err</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// changed after adding errors with</span></span><br><span class="line">    <span class="comment">// https://github.com/vuejs/vue-router/pull/3047 before that change,</span></span><br><span class="line">    <span class="comment">// redirect and aborted navigation would produce an err == null</span></span><br><span class="line">    <span class="keyword">if</span> (!isNavigationFailure(err) &amp;&amp; isError(err)) &#123;</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">this</span>.errorCbs.length) &#123;</span><br><span class="line">        <span class="keyword">this</span>.errorCbs.forEach(<span class="function"><span class="params">cb</span> =&gt;</span> &#123;</span><br><span class="line">          cb(err)</span><br><span class="line">        &#125;)</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        warn(<span class="literal">false</span>, <span class="string">'uncaught error during route navigation:'</span>)</span><br><span class="line">        <span class="built_in">console</span>.error(err)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    onAbort &amp;&amp; onAbort(err)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">const</span> lastRouteIndex = route.matched.length - <span class="number">1</span></span><br><span class="line">  <span class="keyword">const</span> lastCurrentIndex = current.matched.length - <span class="number">1</span></span><br><span class="line">  <span class="keyword">if</span> (</span><br><span class="line">    isSameRoute(route, current) &amp;&amp;</span><br><span class="line">    <span class="comment">// in the case the route map has been dynamically appended to</span></span><br><span class="line">    lastRouteIndex === lastCurrentIndex &amp;&amp;</span><br><span class="line">    route.matched[lastRouteIndex] === current.matched[lastCurrentIndex]</span><br><span class="line">  ) &#123;</span><br><span class="line">    <span class="keyword">this</span>.ensureURL()</span><br><span class="line">    <span class="keyword">return</span> abort(createNavigationDuplicatedError(current, route))</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//  接着又根据 `this.current.matched` 和 `route.matched` 执行了 resolveQueue 方法解析出 3 个队列</span></span><br><span class="line">  <span class="keyword">const</span> &#123; updated, deactivated, activated &#125; = resolveQueue(</span><br><span class="line">    <span class="keyword">this</span>.current.matched,</span><br><span class="line">    route.matched</span><br><span class="line">  )</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> queue: <span class="built_in">Array</span>&lt;?NavigationGuard&gt; = [].concat(</span><br><span class="line">    <span class="comment">// in-component leave guards</span></span><br><span class="line">    extractLeaveGuards(deactivated),</span><br><span class="line">    <span class="comment">// global before hooks</span></span><br><span class="line">    <span class="keyword">this</span>.router.beforeHooks,</span><br><span class="line">    <span class="comment">// in-component update hooks</span></span><br><span class="line">    extractUpdateHooks(updated),</span><br><span class="line">    <span class="comment">// in-config enter guards</span></span><br><span class="line">    activated.map(<span class="function"><span class="params">m</span> =&gt;</span> m.beforeEnter),</span><br><span class="line">    <span class="comment">// async components</span></span><br><span class="line">    resolveAsyncComponents(activated)</span><br><span class="line">  )</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> iterator = <span class="function">(<span class="params">hook: NavigationGuard, next</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.pending !== route) &#123;</span><br><span class="line">      <span class="keyword">return</span> abort(createNavigationCancelledError(current, route))</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      hook(route, current, (to: any) =&gt; &#123;</span><br><span class="line">        <span class="keyword">if</span> (to === <span class="literal">false</span>) &#123;</span><br><span class="line">          <span class="comment">// next(false) -&gt; abort navigation, ensure current URL</span></span><br><span class="line">          <span class="keyword">this</span>.ensureURL(<span class="literal">true</span>)</span><br><span class="line">          abort(createNavigationAbortedError(current, route))</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (isError(to)) &#123;</span><br><span class="line">          <span class="keyword">this</span>.ensureURL(<span class="literal">true</span>)</span><br><span class="line">          abort(to)</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (</span><br><span class="line">          <span class="keyword">typeof</span> to === <span class="string">'string'</span> ||</span><br><span class="line">          (<span class="keyword">typeof</span> to === <span class="string">'object'</span> &amp;&amp;</span><br><span class="line">            (<span class="keyword">typeof</span> to.path === <span class="string">'string'</span> || <span class="keyword">typeof</span> to.name === <span class="string">'string'</span>))</span><br><span class="line">        ) &#123;</span><br><span class="line">          <span class="comment">// next('/') or next(&#123; path: '/' &#125;) -&gt; redirect</span></span><br><span class="line">          abort(createNavigationRedirectedError(current, route))</span><br><span class="line">          <span class="keyword">if</span> (<span class="keyword">typeof</span> to === <span class="string">'object'</span> &amp;&amp; to.replace) &#123;</span><br><span class="line">            <span class="keyword">this</span>.replace(to)</span><br><span class="line">          &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">this</span>.push(to)</span><br><span class="line">          &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          <span class="comment">// confirm transition and pass on the value</span></span><br><span class="line">          next(to)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">      abort(e)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//  最后：官方的说法叫导航守卫，实际上就是发生在路由路径切换的时候，执行的一系列钩子函数。</span></span><br><span class="line">  runQueue(queue, iterator, () =&gt; &#123;</span><br><span class="line">    <span class="comment">// wait until async components are resolved before</span></span><br><span class="line">    <span class="comment">// extracting in-component enter guards</span></span><br><span class="line">    <span class="keyword">const</span> enterGuards = extractEnterGuards(activated)</span><br><span class="line">    <span class="keyword">const</span> queue = enterGuards.concat(<span class="keyword">this</span>.router.resolveHooks)</span><br><span class="line">    runQueue(queue, iterator, () =&gt; &#123;</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">this</span>.pending !== route) &#123;</span><br><span class="line">        <span class="keyword">return</span> abort(createNavigationCancelledError(current, route))</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">this</span>.pending = <span class="literal">null</span></span><br><span class="line">      onComplete(route)</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">this</span>.router.app) &#123;</span><br><span class="line">        <span class="keyword">this</span>.router.app.$nextTick(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">          handleRouteEntered(route)</span><br><span class="line">        &#125;)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">normalizeBase</span> (<span class="params">base: ?string</span>): <span class="title">string</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (!base) &#123;</span><br><span class="line">    <span class="keyword">if</span> (inBrowser) &#123;</span><br><span class="line">      <span class="comment">// respect &lt;base&gt; tag</span></span><br><span class="line">      <span class="keyword">const</span> baseEl = <span class="built_in">document</span>.querySelector(<span class="string">'base'</span>)</span><br><span class="line">      base = (baseEl &amp;&amp; baseEl.getAttribute(<span class="string">'href'</span>)) || <span class="string">'/'</span></span><br><span class="line">      <span class="comment">// strip full URL origin</span></span><br><span class="line">      base = base.replace(<span class="regexp">/^https?:\/\/[^\/]+/</span>, <span class="string">''</span>)</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      base = <span class="string">'/'</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// make sure there's the starting slash</span></span><br><span class="line">  <span class="keyword">if</span> (base.charAt(<span class="number">0</span>) !== <span class="string">'/'</span>) &#123;</span><br><span class="line">    base = <span class="string">'/'</span> + base</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// remove trailing slash</span></span><br><span class="line">  <span class="keyword">return</span> base.replace(<span class="regexp">/\/$/</span>, <span class="string">''</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">resolveQueue</span> (<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">  current: Array&lt;RouteRecord&gt;,</span></span></span><br><span class="line"><span class="function"><span class="params">  next: Array&lt;RouteRecord&gt;</span></span></span><br><span class="line"><span class="function"><span class="params"></span>): </span>&#123;</span><br><span class="line">  updated: <span class="built_in">Array</span>&lt;RouteRecord&gt;,</span><br><span class="line">  activated: <span class="built_in">Array</span>&lt;RouteRecord&gt;,</span><br><span class="line">  deactivated: <span class="built_in">Array</span>&lt;RouteRecord&gt;</span><br><span class="line">&#125; &#123;</span><br><span class="line">  <span class="keyword">let</span> i</span><br><span class="line">  <span class="keyword">const</span> max = <span class="built_in">Math</span>.max(current.length, next.length)</span><br><span class="line">  <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; max; i++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (current[i] !== next[i]) &#123;</span><br><span class="line">      <span class="keyword">break</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    updated: next.slice(<span class="number">0</span>, i),</span><br><span class="line">    activated: next.slice(i),</span><br><span class="line">    deactivated: current.slice(i)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">extractGuards</span> (<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">  records: Array&lt;RouteRecord&gt;,</span></span></span><br><span class="line"><span class="function"><span class="params">  name: string,</span></span></span><br><span class="line"><span class="function"><span class="params">  bind: Function,</span></span></span><br><span class="line"><span class="function"><span class="params">  reverse?: boolean</span></span></span><br><span class="line"><span class="function"><span class="params"></span>): <span class="title">Array</span>&lt;?<span class="title">Function</span>&gt; </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> guards = flatMapComponents(records, (def, instance, match, key) =&gt; &#123;</span><br><span class="line">    <span class="keyword">const</span> guard = extractGuard(def, name)</span><br><span class="line">    <span class="keyword">if</span> (guard) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="built_in">Array</span>.isArray(guard)</span><br><span class="line">        ? guard.map(<span class="function"><span class="params">guard</span> =&gt;</span> bind(guard, instance, match, key))</span><br><span class="line">        : bind(guard, instance, match, key)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line">  <span class="keyword">return</span> flatten(reverse ? guards.reverse() : guards)</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">extractGuard</span> (<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">  def: Object | Function,</span></span></span><br><span class="line"><span class="function"><span class="params">  key: string</span></span></span><br><span class="line"><span class="function"><span class="params"></span>): <span class="title">NavigationGuard</span> | <span class="title">Array</span>&lt;<span class="title">NavigationGuard</span>&gt; </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> def !== <span class="string">'function'</span>) &#123;</span><br><span class="line">    <span class="comment">// extend now so that global mixins are applied.</span></span><br><span class="line">    def = _Vue.extend(def)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> def.options[key]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">extractLeaveGuards</span> (<span class="params">deactivated: Array&lt;RouteRecord&gt;</span>): <span class="title">Array</span>&lt;?<span class="title">Function</span>&gt; </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> extractGuards(deactivated, <span class="string">'beforeRouteLeave'</span>, bindGuard, <span class="literal">true</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">extractUpdateHooks</span> (<span class="params">updated: Array&lt;RouteRecord&gt;</span>): <span class="title">Array</span>&lt;?<span class="title">Function</span>&gt; </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> extractGuards(updated, <span class="string">'beforeRouteUpdate'</span>, bindGuard)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">bindGuard</span> (<span class="params">guard: NavigationGuard, instance: ?_Vue</span>): ?<span class="title">NavigationGuard</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (instance) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> <span class="title">boundRouteGuard</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> guard.apply(instance, <span class="built_in">arguments</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">extractEnterGuards</span> (<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">  activated: Array&lt;RouteRecord&gt;</span></span></span><br><span class="line"><span class="function"><span class="params"></span>): <span class="title">Array</span>&lt;?<span class="title">Function</span>&gt; </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> extractGuards(</span><br><span class="line">    activated,</span><br><span class="line">    <span class="string">'beforeRouteEnter'</span>,</span><br><span class="line">    (guard, _, match, key) =&gt; &#123;</span><br><span class="line">      <span class="keyword">return</span> bindEnterGuard(guard, match, key)</span><br><span class="line">    &#125;</span><br><span class="line">  )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">bindEnterGuard</span> (<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">  guard: NavigationGuard,</span></span></span><br><span class="line"><span class="function"><span class="params">  match: RouteRecord,</span></span></span><br><span class="line"><span class="function"><span class="params">  key: string</span></span></span><br><span class="line"><span class="function"><span class="params"></span>): <span class="title">NavigationGuard</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> <span class="title">routeEnterGuard</span> (<span class="params">to, from, next</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> guard(to, <span class="keyword">from</span>, cb =&gt; &#123;</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">typeof</span> cb === <span class="string">'function'</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!match.enteredCbs[key]) &#123;</span><br><span class="line">          match.enteredCbs[key] = []</span><br><span class="line">        &#125;</span><br><span class="line">        match.enteredCbs[key].push(cb)</span><br><span class="line">      &#125;</span><br><span class="line">      next(cb)</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li></li>
+<li></li>
+</ol>
+<h2 id="两种模式"><a href="#两种模式" class="headerlink" title="两种模式"></a>两种模式</h2><p>在上面VueRouter实例的时候会判断是否支持HashHistory和HTML5History模式然后实例化。这里看一下这两种模式的源码</p>
+<h3 id="HashHistory"><a href="#HashHistory" class="headerlink" title="HashHistory"></a>HashHistory</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="class"><span class="keyword">class</span> <span class="title">HashHistory</span> <span class="keyword">extends</span> <span class="title">History</span> </span>&#123;</span><br><span class="line">  <span class="keyword">constructor</span> (router: Router, base: ?string, fallback: boolean) &#123;</span><br><span class="line">    <span class="keyword">super</span>(router, base)</span><br><span class="line">    <span class="comment">// check history fallback deeplinking</span></span><br><span class="line">    <span class="keyword">if</span> (fallback &amp;&amp; checkFallback(<span class="keyword">this</span>.base)) &#123;</span><br><span class="line">      <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">    ensureSlash()</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// this is delayed until the app mounts</span></span><br><span class="line">  <span class="comment">// to avoid the hashchange listener being fired too early</span></span><br><span class="line">  setupListeners () &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.listeners.length &gt; <span class="number">0</span>) &#123;</span><br><span class="line">      <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> router = <span class="keyword">this</span>.router</span><br><span class="line">    <span class="keyword">const</span> expectScroll = router.options.scrollBehavior</span><br><span class="line">    <span class="keyword">const</span> supportsScroll = supportsPushState &amp;&amp; expectScroll</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (supportsScroll) &#123;</span><br><span class="line">      <span class="keyword">this</span>.listeners.push(setupScroll())</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> handleRoutingEvent = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">const</span> current = <span class="keyword">this</span>.current</span><br><span class="line">      <span class="keyword">if</span> (!ensureSlash()) &#123;</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">this</span>.transitionTo(getHash(), route =&gt; &#123;</span><br><span class="line">        <span class="keyword">if</span> (supportsScroll) &#123;</span><br><span class="line">          handleScroll(<span class="keyword">this</span>.router, route, current, <span class="literal">true</span>)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (!supportsPushState) &#123;</span><br><span class="line">          replaceHash(route.fullPath)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">const</span> eventType = supportsPushState ? <span class="string">'popstate'</span> : <span class="string">'hashchange'</span></span><br><span class="line">    <span class="built_in">window</span>.addEventListener(</span><br><span class="line">      eventType,</span><br><span class="line">      handleRoutingEvent</span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">this</span>.listeners.push(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="built_in">window</span>.removeEventListener(eventType, handleRoutingEvent)</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  push (location: RawLocation, onComplete?: <span class="built_in">Function</span>, onAbort?: <span class="built_in">Function</span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; <span class="attr">current</span>: fromRoute &#125; = <span class="keyword">this</span></span><br><span class="line">    <span class="keyword">this</span>.transitionTo(</span><br><span class="line">      location,</span><br><span class="line">      route =&gt; &#123;</span><br><span class="line">        pushHash(route.fullPath)</span><br><span class="line">        handleScroll(<span class="keyword">this</span>.router, route, fromRoute, <span class="literal">false</span>)</span><br><span class="line">        onComplete &amp;&amp; onComplete(route)</span><br><span class="line">      &#125;,</span><br><span class="line">      onAbort</span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  replace (location: RawLocation, onComplete?: <span class="built_in">Function</span>, onAbort?: <span class="built_in">Function</span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; <span class="attr">current</span>: fromRoute &#125; = <span class="keyword">this</span></span><br><span class="line">    <span class="keyword">this</span>.transitionTo(</span><br><span class="line">      location,</span><br><span class="line">      route =&gt; &#123;</span><br><span class="line">        replaceHash(route.fullPath)</span><br><span class="line">        handleScroll(<span class="keyword">this</span>.router, route, fromRoute, <span class="literal">false</span>)</span><br><span class="line">        onComplete &amp;&amp; onComplete(route)</span><br><span class="line">      &#125;,</span><br><span class="line">      onAbort</span><br><span class="line">    )</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  go (n: number) &#123;</span><br><span class="line">    <span class="built_in">window</span>.history.go(n)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  ensureURL (push?: boolean) &#123;</span><br><span class="line">    <span class="keyword">const</span> current = <span class="keyword">this</span>.current.fullPath</span><br><span class="line">    <span class="keyword">if</span> (getHash() !== current) &#123;</span><br><span class="line">      push ? pushHash(current) : replaceHash(current)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  getCurrentLocation () &#123;</span><br><span class="line">    <span class="keyword">return</span> getHash()</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">checkFallback</span> (<span class="params">base</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> location = getLocation(base)</span><br><span class="line">  <span class="keyword">if</span> (!<span class="regexp">/^\/#/</span>.test(location)) &#123;</span><br><span class="line">    <span class="built_in">window</span>.location.replace(cleanPath(base + <span class="string">'/#'</span> + location))</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">ensureSlash</span> (<span class="params"></span>): <span class="title">boolean</span> </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> path = getHash()</span><br><span class="line">  <span class="keyword">if</span> (path.charAt(<span class="number">0</span>) === <span class="string">'/'</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">  &#125;</span><br><span class="line">  replaceHash(<span class="string">'/'</span> + path)</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">getHash</span> (<span class="params"></span>): <span class="title">string</span> </span>&#123;</span><br><span class="line">  <span class="comment">// We can't use window.location.hash here because it's not</span></span><br><span class="line">  <span class="comment">// consistent across browsers - Firefox will pre-decode it!</span></span><br><span class="line">  <span class="keyword">let</span> href = <span class="built_in">window</span>.location.href</span><br><span class="line">  <span class="keyword">const</span> index = href.indexOf(<span class="string">'#'</span>)</span><br><span class="line">  <span class="comment">// empty path</span></span><br><span class="line">  <span class="keyword">if</span> (index &lt; <span class="number">0</span>) <span class="keyword">return</span> <span class="string">''</span></span><br><span class="line"></span><br><span class="line">  href = href.slice(index + <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> href</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getUrl</span> (<span class="params">path</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> href = <span class="built_in">window</span>.location.href</span><br><span class="line">  <span class="keyword">const</span> i = href.indexOf(<span class="string">'#'</span>)</span><br><span class="line">  <span class="keyword">const</span> base = i &gt;= <span class="number">0</span> ? href.slice(<span class="number">0</span>, i) : href</span><br><span class="line">  <span class="keyword">return</span> <span class="string">`<span class="subst">$&#123;base&#125;</span>#<span class="subst">$&#123;path&#125;</span>`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">pushHash</span> (<span class="params">path</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (supportsPushState) &#123;</span><br><span class="line">    pushState(getUrl(path))</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">window</span>.location.hash = path</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">replaceHash</span> (<span class="params">path</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (supportsPushState) &#123;</span><br><span class="line">    replaceState(getUrl(path))</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">window</span>.location.replace(getUrl(path))</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到，当路由变化时，调用<code>push/replace -&gt; tanstionTo -&gt; updateRoute -&gt; this.cb</code>方法，而<code>this.cb</code>方法是通过<code>History.listen(cb)</code>进行设置的，在init()中对其进行了设置：</p>
+<h4 id="监听地址栏"><a href="#监听地址栏" class="headerlink" title="监听地址栏"></a>监听地址栏</h4><p>上面的VueRouter.push()和VueRouter.replace()是可以在vue组件的逻辑代码中直接调用的，除此之外在浏览器中，用户还可以直接在浏览器地址栏中输入改变路由，因此还需要监听浏览器地址栏中路由的变化 ，并具有与通过代码调用相同的响应行为，在HashHistory中这一功能通过setupListeners监听hashchange实现：<br>该方法设置监听了浏览器事件hashchange,调用的函数为replaceHash,即在浏览器地址栏中直接输入路由相当于代码调用了replace()方法。</p>
+<h3 id="HTML5History"><a href="#HTML5History" class="headerlink" title="HTML5History"></a>HTML5History</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* @flow */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> type Router <span class="keyword">from</span> <span class="string">'../index'</span></span><br><span class="line"><span class="keyword">import</span> &#123; History &#125; <span class="keyword">from</span> <span class="string">'./base'</span></span><br><span class="line"><span class="keyword">import</span> &#123; cleanPath &#125; <span class="keyword">from</span> <span class="string">'../util/path'</span></span><br><span class="line"><span class="keyword">import</span> &#123; START &#125; <span class="keyword">from</span> <span class="string">'../util/route'</span></span><br><span class="line"><span class="keyword">import</span> &#123; setupScroll, handleScroll &#125; <span class="keyword">from</span> <span class="string">'../util/scroll'</span></span><br><span class="line"><span class="keyword">import</span> &#123; pushState, replaceState, supportsPushState &#125; <span class="keyword">from</span> <span class="string">'../util/push-state'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="class"><span class="keyword">class</span> <span class="title">HTML5History</span> <span class="keyword">extends</span> <span class="title">History</span> </span>&#123;</span><br><span class="line">  _startLocation: string</span><br><span class="line"></span><br><span class="line">  <span class="keyword">constructor</span> (router: Router, base: ?string) &#123;</span><br><span class="line">    <span class="keyword">super</span>(router, base)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>._startLocation = getLocation(<span class="keyword">this</span>.base)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  setupListeners () &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.listeners.length &gt; <span class="number">0</span>) &#123;</span><br><span class="line">      <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> router = <span class="keyword">this</span>.router</span><br><span class="line">    <span class="keyword">const</span> expectScroll = router.options.scrollBehavior</span><br><span class="line">    <span class="keyword">const</span> supportsScroll = supportsPushState &amp;&amp; expectScroll</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (supportsScroll) &#123;</span><br><span class="line">      <span class="keyword">this</span>.listeners.push(setupScroll())</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> handleRoutingEvent = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">const</span> current = <span class="keyword">this</span>.current</span><br><span class="line"></span><br><span class="line">      <span class="comment">// Avoiding first `popstate` event dispatched in some browsers but first</span></span><br><span class="line">      <span class="comment">// history route not updated since async guard at the same time.</span></span><br><span class="line">      <span class="keyword">const</span> location = getLocation(<span class="keyword">this</span>.base)</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">this</span>.current === START &amp;&amp; location === <span class="keyword">this</span>._startLocation) &#123;</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">this</span>.transitionTo(location, route =&gt; &#123;</span><br><span class="line">        <span class="keyword">if</span> (supportsScroll) &#123;</span><br><span class="line">          handleScroll(router, route, current, <span class="literal">true</span>)</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">window</span>.addEventListener(<span class="string">'popstate'</span>, handleRoutingEvent)</span><br><span class="line">    <span class="keyword">this</span>.listeners.push(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="built_in">window</span>.removeEventListener(<span class="string">'popstate'</span>, handleRoutingEvent)</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  go (n: number) &#123;</span><br><span class="line">    <span class="built_in">window</span>.history.go(n)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  push (location: RawLocation, onComplete?: <span class="built_in">Function</span>, onAbort?: <span class="built_in">Function</span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; <span class="attr">current</span>: fromRoute &#125; = <span class="keyword">this</span></span><br><span class="line">    <span class="keyword">this</span>.transitionTo(location, route =&gt; &#123;</span><br><span class="line">      pushState(cleanPath(<span class="keyword">this</span>.base + route.fullPath))</span><br><span class="line">      handleScroll(<span class="keyword">this</span>.router, route, fromRoute, <span class="literal">false</span>)</span><br><span class="line">      onComplete &amp;&amp; onComplete(route)</span><br><span class="line">    &#125;, onAbort)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  replace (location: RawLocation, onComplete?: <span class="built_in">Function</span>, onAbort?: <span class="built_in">Function</span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; <span class="attr">current</span>: fromRoute &#125; = <span class="keyword">this</span></span><br><span class="line">    <span class="keyword">this</span>.transitionTo(location, route =&gt; &#123;</span><br><span class="line">      replaceState(cleanPath(<span class="keyword">this</span>.base + route.fullPath))</span><br><span class="line">      handleScroll(<span class="keyword">this</span>.router, route, fromRoute, <span class="literal">false</span>)</span><br><span class="line">      onComplete &amp;&amp; onComplete(route)</span><br><span class="line">    &#125;, onAbort)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  ensureURL (push?: boolean) &#123;</span><br><span class="line">    <span class="keyword">if</span> (getLocation(<span class="keyword">this</span>.base) !== <span class="keyword">this</span>.current.fullPath) &#123;</span><br><span class="line">      <span class="keyword">const</span> current = cleanPath(<span class="keyword">this</span>.base + <span class="keyword">this</span>.current.fullPath)</span><br><span class="line">      push ? pushState(current) : replaceState(current)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  getCurrentLocation (): string &#123;</span><br><span class="line">    <span class="keyword">return</span> getLocation(<span class="keyword">this</span>.base)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">getLocation</span> (<span class="params">base: string</span>): <span class="title">string</span> </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> path = <span class="built_in">window</span>.location.pathname</span><br><span class="line">  <span class="keyword">if</span> (base &amp;&amp; path.toLowerCase().indexOf(base.toLowerCase()) === <span class="number">0</span>) &#123;</span><br><span class="line">    path = path.slice(base.length)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> (path || <span class="string">'/'</span>) + <span class="built_in">window</span>.location.search + <span class="built_in">window</span>.location.hash</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">pushState</span> (<span class="params">url?: string, replace?: boolean</span>) </span>&#123;</span><br><span class="line">    saveScrollPosition()</span><br><span class="line">    <span class="comment">// 加了 try...catch 是因为 Safari 有调用 pushState 100 次限制</span></span><br><span class="line">    <span class="comment">// 一旦达到就会抛出 DOM Exception 18 错误</span></span><br><span class="line">    <span class="keyword">const</span> history = <span class="built_in">window</span>.history</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (replace) &#123;</span><br><span class="line">            <span class="comment">// replace 的话 key 还是当前的 key 没必要生成新的</span></span><br><span class="line">            history.replaceState(&#123; <span class="attr">key</span>: _key &#125;, <span class="string">''</span>, url)</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 重新生成 key</span></span><br><span class="line">            _key = genKey()</span><br><span class="line">            <span class="comment">// 带入新的 key 值</span></span><br><span class="line">            history.pushState(&#123; <span class="attr">key</span>: _key &#125;, <span class="string">''</span>, url)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">        <span class="comment">// 达到限制了 则重新指定新的地址</span></span><br><span class="line">        <span class="built_in">window</span>.location[replace ? <span class="string">'replace'</span> : <span class="string">'assign'</span>](url)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 直接调用 pushState 传入 replace 为 true</span></span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">replaceState</span> (<span class="params">url?: string</span>) </span>&#123;</span><br><span class="line">    pushState(url, <span class="literal">true</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="https://juejin.im/post/6844903612930326541" target="_blank" rel="noopener">https://juejin.im/post/6844903612930326541</a><br><a href="https://juejin.im/post/6844903695365177352" target="_blank" rel="noopener">https://juejin.im/post/6844903695365177352</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/vue-router/" rel="tag"># vue-router</a>
+          
+            <a href="/tags/vue-router%E5%8E%9F%E7%90%86/" rel="tag"># vue-router原理</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/08/28/JS%E7%BB%A7%E6%89%BF/" rel="next" title="JS继承">
+                <i class="fa fa-chevron-left"></i> JS继承
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/08/30/Vuex%E8%AF%A6%E8%A7%A3/" rel="prev" title="Vuex详解">
+                Vuex详解 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+      <div id="sidebar-dimmer"></div>
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">CHJ</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#是什么"><span class="nav-number">1.</span> <span class="nav-text">是什么</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#路由模式"><span class="nav-number">1.1.</span> <span class="nav-text">路由模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#hash"><span class="nav-number">1.1.1.</span> <span class="nav-text">hash</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#history"><span class="nav-number">1.1.2.</span> <span class="nav-text">history</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#abstract"><span class="nav-number">1.1.3.</span> <span class="nav-text">abstract</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#原理"><span class="nav-number">2.</span> <span class="nav-text">原理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#install方法"><span class="nav-number">2.1.</span> <span class="nav-text">install方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VueRouter"><span class="nav-number">2.2.</span> <span class="nav-text">VueRouter</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#createMatcher方法相关"><span class="nav-number">2.2.1.</span> <span class="nav-text">createMatcher方法相关</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#addRoutes-方法"><span class="nav-number">2.2.1.1.</span> <span class="nav-text">addRoutes 方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#match-方法"><span class="nav-number">2.2.1.2.</span> <span class="nav-text">match 方法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#init方法"><span class="nav-number">2.2.2.</span> <span class="nav-text">init方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#transitionTo"><span class="nav-number">2.3.</span> <span class="nav-text">transitionTo()</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#confirmTransition"><span class="nav-number">2.3.1.</span> <span class="nav-text">confirmTransition</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#两种模式"><span class="nav-number">2.4.</span> <span class="nav-text">两种模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#HashHistory"><span class="nav-number">2.4.1.</span> <span class="nav-text">HashHistory</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#监听地址栏"><span class="nav-number">2.4.1.1.</span> <span class="nav-text">监听地址栏</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTML5History"><span class="nav-number">2.4.2.</span> <span class="nav-text">HTML5History</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">CHJ</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: '6TinlJFouGMf4xEFTMVooGH4-gzGzoHsz',
+        appKey: 'vzkHbGQsFljhDuiRMuyH11Ir',
+        placeholder: '说点什么',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
