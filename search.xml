@@ -773,6 +773,7 @@
     <url>/2020/10/19/koa%E4%B8%8Eexpress%E7%9A%84%E4%B8%AD%E9%97%B4%E4%BB%B6%E6%9C%BA%E5%88%B6/</url>
     <content><![CDATA[<p>仔细看一下koa除了调用next的时候前面加了一个await好像和express没有任何区别，都是函数嵌套，都是洋葱模型。但是咱们回过头再仔细看一下文章最上面koa的运行代码，koa是在哪里响应的用户请求呢？koa中好型并没有cxt.send这样的函数，只有cxt.body，但是调用cxt.body并不是直接结束请求返回响应啊，和express的res.send有着本质上的不同。下面引用一段其他网友总结的express和koa中间件机制的不同，我个人感觉总结的很到位：</p>
 <p>其实中间件执行逻辑没有什么特别的不同，都是依赖函数调用栈的执行顺序，抬杠一点讲都可以叫做洋葱模型。Koa 依靠 async/await（generator + co）让异步操作可以变成同步写法，更好理解。最关键的不是这些中间的执行顺序，而是响应的时机，Express 使用 res.end() 是立即返回，这样想要做出些响应前的操作变得比较麻烦；而 Koa 是在所有中间件中使用 ctx.body 设置响应数据，但是并不立即响应，而是在所有中间件执行结束后，再调用 res.end(ctx.body) 进行响应，这样就为响应前的操作预留了空间，所以是请求与响应都在最外层，中间件处理是一层层进行，所以被理解成洋葱模型，个人拙见。<br><a href="https://cloud.tencent.com/developer/article/1467268" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1467268</a></p>
+<p>hahahahah</p>
 ]]></content>
   </entry>
   <entry>
@@ -1533,6 +1534,31 @@ Vue2只支持绑定一个值，绑定多个值需要使用v-bind.sync<br><code>&
       <tags>
         <tag>vue源码</tag>
         <tag>vue双向绑定</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>react生命周期</title>
+    <url>/2021/03/07/react%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/</url>
+    <content><![CDATA[<p><img src="/images/react/react%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.png" alt="react生命周期" title="图片标题"></p>
+<h1 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h1><p>此阶段会在constructor进行初始化赋值操作。</p>
+<h2 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h2><p>此时不应该将props的数据在constructor赋值给state，因为当父组件prop的值改变时，子组件不会再次执行constructor。应在生命周期componentWillReceiveProps中重新赋值</p>
+<h1 id="挂载阶段"><a href="#挂载阶段" class="headerlink" title="挂载阶段"></a>挂载阶段</h1><p>此阶段主要生命周期为<strong>componentWillMount</strong>和<strong>componentDidMount</strong>。<br>流程为 componentWillMount =&gt; render =&gt; componentDidMount</p>
+<h1 id="更新阶段"><a href="#更新阶段" class="headerlink" title="更新阶段"></a>更新阶段</h1><p>此阶段由于state和props更新引起</p>
+<p>流程为：<br>componentWillReceiveProps(nextProps, nextState) =&gt; shouldComponetUpdate =&gt; componentWillUpdate =&gt; render =&gt; componentDidUpdate</p>
+<p>state更新没有componentWillReceiveProps过程</p>
+<h1 id="卸载阶段"><a href="#卸载阶段" class="headerlink" title="卸载阶段"></a>卸载阶段</h1><p>componentWillUnmount<br>omponentWillUnmount 中不应调用 setState，因为该组件将永远不会重新渲染。组件实例卸载后，将永远不会再挂载它</p>
+<h1 id="注意-1"><a href="#注意-1" class="headerlink" title="注意"></a>注意</h1><p>在react16中去掉了<br>componentWillMount，<br>componentWillReceiveProps，<br>componentWillUpdate，<br>这三个生命周期</p>
+<p>新增了：<br>getDerivedStateFromProps(nextProps,nextState)在组件实例化、接收到新的 props 、组件状态更新时会被调用</p>
+<p>getSnapshotBeforeUpdate（prevProps,prevState）<br>在 render 函数调用之后，实际的 Dom 渲染之前，在这个阶段我们可以拿到上一个状态 Dom 元素的坐标、大小的等相关信息。用于替代旧的生命周期中的 componentWillUpdate。<br>该函数的返回值将会作为 componentDidUpdate 的第三个参数出现。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>react生命周期分为初始化-挂载-更新-销毁<br>初始化会执行constructor<br>挂载包括componentWillMount,componentDidMount<br>更新包括componentWillRecieveProps=&gt;shouldComponentUpdate=&gt;componentWillUpdate=&gt;render=&gt;componentDidUpdate<br>卸载包括componentWillUnmount</p>
+<p><a href="https://segmentfault.com/a/1190000022880456" target="_blank" rel="noopener">https://segmentfault.com/a/1190000022880456</a></p>
+]]></content>
+      <categories>
+        <category>react</category>
+      </categories>
+      <tags>
+        <tag>react</tag>
+        <tag>react生命周期</tag>
       </tags>
   </entry>
 </search>

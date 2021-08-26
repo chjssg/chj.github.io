@@ -92,7 +92,7 @@
 <meta property="og:site_name" content="CHJ">
 <meta property="og:description" content="仔细看一下koa除了调用next的时候前面加了一个await好像和express没有任何区别，都是函数嵌套，都是洋葱模型。但是咱们回过头再仔细看一下文章最上面koa的运行代码，koa是在哪里响应的用户请求呢？koa中好型并没有cxt.send这样的函数，只有cxt.body，但是调用cxt.body并不是直接结束请求返回响应啊，和express的res.send有着本质上的不同。下面引用一段其他网">
 <meta property="article:published_time" content="2020-10-19T14:30:41.000Z">
-<meta property="article:modified_time" content="2020-12-30T08:01:09.694Z">
+<meta property="article:modified_time" content="2021-01-20T09:22:10.781Z">
 <meta property="article:author" content="CHJ">
 <meta name="twitter:card" content="summary">
 
@@ -395,6 +395,7 @@
       
         <p>仔细看一下koa除了调用next的时候前面加了一个await好像和express没有任何区别，都是函数嵌套，都是洋葱模型。但是咱们回过头再仔细看一下文章最上面koa的运行代码，koa是在哪里响应的用户请求呢？koa中好型并没有cxt.send这样的函数，只有cxt.body，但是调用cxt.body并不是直接结束请求返回响应啊，和express的res.send有着本质上的不同。下面引用一段其他网友总结的express和koa中间件机制的不同，我个人感觉总结的很到位：</p>
 <p>其实中间件执行逻辑没有什么特别的不同，都是依赖函数调用栈的执行顺序，抬杠一点讲都可以叫做洋葱模型。Koa 依靠 async/await（generator + co）让异步操作可以变成同步写法，更好理解。最关键的不是这些中间的执行顺序，而是响应的时机，Express 使用 res.end() 是立即返回，这样想要做出些响应前的操作变得比较麻烦；而 Koa 是在所有中间件中使用 ctx.body 设置响应数据，但是并不立即响应，而是在所有中间件执行结束后，再调用 res.end(ctx.body) 进行响应，这样就为响应前的操作预留了空间，所以是请求与响应都在最外层，中间件处理是一层层进行，所以被理解成洋葱模型，个人拙见。<br><a href="https://cloud.tencent.com/developer/article/1467268" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1467268</a></p>
+<p>hahahahah</p>
 
       
     </div>
@@ -504,7 +505,7 @@
               
                 <a href="/archives/%7C%7C%20archive">
               
-                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-count">39</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -515,7 +516,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-count">20</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -526,7 +527,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-count">48</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -563,7 +564,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
